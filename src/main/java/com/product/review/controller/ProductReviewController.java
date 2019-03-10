@@ -1,6 +1,7 @@
 package com.product.review.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.product.review.domain.Review;
+import com.product.review.exception.OperationNotPerformed;
+import com.product.review.exception.ReviewNotFoundException;
 import com.product.review.service.ProdcutReviewService;
 
 @RestController
@@ -33,22 +36,36 @@ public class ProductReviewController {
 	@PostMapping(value = "/{productid}/reviews")
 	public ResponseEntity<?> createProductReview(@PathVariable("productid") Integer productID, @RequestBody Review review) {
 		review.setProductId(productID);
-		return new ResponseEntity<>(reviewService.saveProductReview(review), HttpStatus.CREATED);
+		Review review1=reviewService.saveProductReview(review);
+		if(review1 == null){
+			throw new OperationNotPerformed("Data not inserted into  DB.");
+		}
+		return new ResponseEntity<>(review1.getReviewId(), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/{productid}/reviews/{reviewid}")
 	public ResponseEntity<?> updateProductReview(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID,
 			@RequestBody Review review) {
-		review.setProductId(productID);
-		 Review r=reviewService.saveProductReview(review);
-		return new ResponseEntity<>(r, HttpStatus.OK);
+		Optional<Review> review1=reviewService.getReviewById(reviewID);
+		review1.ifPresent(r -> {
+			r.setProductId(productID);			
+			reviewService.saveProductReview(r);
+		});
+		review1.orElseThrow(() -> new ReviewNotFoundException("Review Not Found"));
+								 
+		return new ResponseEntity<>(review1.get().getReviewId(), HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/{productid}/reviews/{reviewid}")
 	public ResponseEntity<?> deleteProductReview(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID) {
+		Optional<Review> review1=reviewService.getReviewById(reviewID);
+		review1.ifPresent(r -> {
+			reviewService.deleteProductReview(productID, reviewID);	
+		});
 		
-		reviewService.deleteProductReview(productID, reviewID);
-		 return new ResponseEntity<>("Record deleted successfully", HttpStatus.OK);
+		review1.orElseThrow(() -> new OperationNotPerformed("Data not deleted from DB."));
+		
+		return new ResponseEntity<>("Record deleted successfully", HttpStatus.OK);
 	}
 
 }
