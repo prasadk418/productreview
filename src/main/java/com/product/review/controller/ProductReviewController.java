@@ -32,6 +32,12 @@ public class ProductReviewController {
 		List<Review> reviews = reviewService.getProductReviews(productID);
 		return new ResponseEntity<>(reviews, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/{productid}/reviews/{reviewid}")
+	public ResponseEntity<?> getProductReviews(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID) {
+		Optional<Review> reviews = reviewService.getReviewById(productID, reviewID);//getProductReviews(productID);
+		return new ResponseEntity<>(reviews, HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/{productid}/reviews")
 	public ResponseEntity<?> createProductReview(@PathVariable("productid") Integer productID, @RequestBody Review review) {
