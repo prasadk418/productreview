@@ -1,12 +1,19 @@
 package com.product.review.service;
 
+import static com.product.review.util.ReviewUtil.isNotPresent;
+import static com.product.review.util.ReviewUtil.isPresent;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.product.review.domain.Review;
+import com.product.review.exception.OperationNotPerformed;
+import com.product.review.exception.ReviewNotFoundException;
 import com.product.review.repository.ProductReviewRepository;
 
 @Service
@@ -21,30 +28,46 @@ public class ProdcutReviewServiceImpl implements ProdcutReviewService {
 	}
 	
 	@Override
-	public Review saveProductReview(Review product) {
-		return reviewRepository.save(product);
+	public Review saveProductReview(Review review) {
+		Review review1=reviewRepository.save(review);
+		if(review1 == null){
+			throw new OperationNotPerformed("Data not inserted into  DB.");
+		}
+		return review1;
 	}
 
 	@Override
-	public Review updateProductReview(Review product) {
-		return reviewRepository.save(product);		
+	public Review updateProductReview(Review review) {
+		return reviewRepository.save(review);				
 	}
 	
+	@Transactional
+	@Modifying
 	public void deleteProductReview(Integer reviewID, Integer productID) {
-		reviewRepository.deleteProductReview(productID, reviewID);
+		reviewRepository.deleteById(reviewID);		
+		Optional<Review> review=reviewRepository.findById(reviewID);
+		if(isPresent(review)){
+			throw new OperationNotPerformed("Data not deleted into  DB.");
+		}		
 		
 	}
 
 	@Override
-	public Optional<Review> getReviewById(Integer reviewId) {		
+	public Review getReviewById(Integer reviewId) {		
 		Optional<Review> review=reviewRepository.findById(reviewId);
-		return review;
+		if(isNotPresent(review)){
+			throw new ReviewNotFoundException(reviewId+" : Review details not found...!");
+		}
+		return review.get();
 	}
 
 	@Override
-	public Optional<Review> getReviewById(Integer productId, Integer reviewId) {
+	public Review getReviewById(Integer productId, Integer reviewId) {
 		Optional<Review> review=reviewRepository.getReviewByProductId(productId, reviewId);
-		return review;
+		if(isNotPresent(review)){
+			throw new ReviewNotFoundException(reviewId+" : Review details not found...!");
+		}
+		return review.get();
 	}
 
 	

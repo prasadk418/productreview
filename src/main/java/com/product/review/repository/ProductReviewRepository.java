@@ -19,9 +19,6 @@ public interface ProductReviewRepository extends JpaRepository<Review, Integer>{
 	
 	@Query("select review from Review review where review.productId=:productID AND review.reviewId=:reviewID")
 	public Optional<Review> getReviewByProductId(@Param("productID") Integer productID, @Param("reviewID") Integer reviewID);
-	
-	@Query("delete from Review review where review.productId=:productID AND review.reviewId=:reviewID")
-	public List<Review> deleteProductReview(@Param("productID") Integer productID, @Param("reviewID") Integer reviewID);
-	
+		
 }
  

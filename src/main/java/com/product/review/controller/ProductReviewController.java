@@ -32,46 +32,38 @@ public class ProductReviewController {
 		List<Review> reviews = reviewService.getProductReviews(productID);
 		return new ResponseEntity<>(reviews, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/{productid}/reviews/{reviewid}")
-	public ResponseEntity<?> getProductReviews(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID) {
-		Optional<Review> reviews = reviewService.getReviewById(productID, reviewID);//getProductReviews(productID);
-		return new ResponseEntity<>(reviews, HttpStatus.OK);
+	public ResponseEntity<?> getProductReviews(@PathVariable("productid") Integer productID,
+			@PathVariable("reviewid") Integer reviewID) {
+		Review review = reviewService.getReviewById(productID, reviewID);
+		return new ResponseEntity<>(review, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/{productid}/reviews")
-	public ResponseEntity<?> createProductReview(@PathVariable("productid") Integer productID, @RequestBody Review review) {
+	public ResponseEntity<?> createProductReview(@PathVariable("productid") Integer productID,
+			@RequestBody Review review) {
 		review.setProductId(productID);
-		Review review1=reviewService.saveProductReview(review);
-		if(review1 == null){
-			throw new OperationNotPerformed("Data not inserted into  DB.");
-		}
-		return new ResponseEntity<>(review1.getReviewId(), HttpStatus.CREATED);
+		Review review1 = reviewService.saveProductReview(review);
+
+		return new ResponseEntity<>(review1, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/{productid}/reviews/{reviewid}")
-	public ResponseEntity<?> updateProductReview(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID,
-			@RequestBody Review review) {
-		Optional<Review> review1=reviewService.getReviewById(reviewID);
-		review1.ifPresent(r -> {
-			r.setProductId(productID);			
-			reviewService.saveProductReview(r);
-		});
-		review1.orElseThrow(() -> new ReviewNotFoundException("Review Not Found"));
-								 
-		return new ResponseEntity<>(review1.get().getReviewId(), HttpStatus.OK);
+	public ResponseEntity<?> updateProductReview(@PathVariable("productid") Integer productID,
+			@PathVariable("reviewid") Integer reviewID, @RequestBody Review review) {
+		reviewService.getReviewById(reviewID);
+		Review reviewResponse = reviewService.saveProductReview(review);
+		return new ResponseEntity<>(reviewResponse, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/{productid}/reviews/{reviewid}")
-	public ResponseEntity<?> deleteProductReview(@PathVariable("productid") Integer productID, @PathVariable("reviewid") Integer reviewID) {
-		Optional<Review> review1=reviewService.getReviewById(reviewID);
-		review1.ifPresent(r -> {
-			reviewService.deleteProductReview(productID, reviewID);	
-		});
-		
-		review1.orElseThrow(() -> new OperationNotPerformed("Data not deleted from DB."));
-		
-		return new ResponseEntity<>("Record deleted successfully", HttpStatus.OK);
+	public ResponseEntity<?> deleteProductReview(@PathVariable("productid") Integer productID,
+			@PathVariable("reviewid") Integer reviewID) {
+		reviewService.getReviewById(reviewID);
+		reviewService.deleteProductReview(productID, reviewID);
+
+		return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
 	}
 
 }

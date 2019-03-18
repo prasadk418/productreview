@@ -29,7 +29,18 @@ public class Review implements Serializable{
 	@Column
 	private Integer rating;
 	
+	public Review(){
+		
+	}
 	
+	public Review(Integer reviewId, Integer productId, String description, Integer rating) {
+		super();
+		this.reviewId = reviewId;
+		this.productId = productId;
+		this.description = description;
+		this.rating = rating;
+	}
+
 	public Integer getProductId() {
 		return productId;
 	}
