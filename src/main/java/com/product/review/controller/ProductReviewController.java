@@ -1,7 +1,6 @@
 package com.product.review.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.product.review.domain.Review;
-import com.product.review.exception.OperationNotPerformed;
-import com.product.review.exception.ReviewNotFoundException;
 import com.product.review.service.ProdcutReviewService;
 
 @RestController
@@ -52,17 +49,17 @@ public class ProductReviewController {
 	@PutMapping(value = "/{productid}/reviews/{reviewid}")
 	public ResponseEntity<?> updateProductReview(@PathVariable("productid") Integer productID,
 			@PathVariable("reviewid") Integer reviewID, @RequestBody Review review) {
-		reviewService.getReviewById(reviewID);
+		
+		review.setProductId(productID);
+		review.setReviewId(reviewID);
 		Review reviewResponse = reviewService.saveProductReview(review);
 		return new ResponseEntity<>(reviewResponse, HttpStatus.OK);
 	}
 
 	@DeleteMapping(value = "/{productid}/reviews/{reviewid}")
 	public ResponseEntity<?> deleteProductReview(@PathVariable("productid") Integer productID,
-			@PathVariable("reviewid") Integer reviewID) {
-		reviewService.getReviewById(reviewID);
+			@PathVariable("reviewid") Integer reviewID) {		
 		reviewService.deleteProductReview(productID, reviewID);
-
 		return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
 	}
 

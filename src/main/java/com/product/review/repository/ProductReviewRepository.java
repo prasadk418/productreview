@@ -15,10 +15,10 @@ import com.product.review.domain.Review;
 public interface ProductReviewRepository extends JpaRepository<Review, Integer>{
 
 	@Query("select review from Review review where review.productId=:productID")
-	public List<Review> getReviewsByProductId(@Param("productID") Integer productID);
+	public List<Review> findReviewByProductId(@Param("productID") Integer productID);
 	
 	@Query("select review from Review review where review.productId=:productID AND review.reviewId=:reviewID")
-	public Optional<Review> getReviewByProductId(@Param("productID") Integer productID, @Param("reviewID") Integer reviewID);
+	public Optional<Review> findReviewByProductId(@Param("productID") Integer productID, @Param("reviewID") Integer reviewID);
 		
 }
  
