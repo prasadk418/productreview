@@ -24,11 +24,12 @@ public class ProdcutReviewServiceImpl implements ProdcutReviewService {
 	
 	@Override
 	public List<Review> getProductReviews(Integer productId) {				
-		return reviewRepository.getReviewsByProductId(productId);
+		return reviewRepository.findReviewByProductId(productId);
 	}
 	
 	@Override
 	public Review saveProductReview(Review review) {
+		getReviewById(review.getReviewId());
 		Review review1=reviewRepository.save(review);
 		if(review1 == null){
 			throw new OperationNotPerformed("Data not inserted into  DB.");
@@ -44,6 +45,7 @@ public class ProdcutReviewServiceImpl implements ProdcutReviewService {
 	@Transactional
 	@Modifying
 	public void deleteProductReview(Integer reviewID, Integer productID) {
+		getReviewById(reviewID);
 		reviewRepository.deleteById(reviewID);		
 		Optional<Review> review=reviewRepository.findById(reviewID);
 		if(isPresent(review)){
@@ -63,7 +65,7 @@ public class ProdcutReviewServiceImpl implements ProdcutReviewService {
 
 	@Override
 	public Review getReviewById(Integer productId, Integer reviewId) {
-		Optional<Review> review=reviewRepository.getReviewByProductId(productId, reviewId);
+		Optional<Review> review=reviewRepository.findReviewByProductId(productId, reviewId);
 		if(isNotPresent(review)){
 			throw new ReviewNotFoundException(reviewId+" : Review details not found...!");
 		}
