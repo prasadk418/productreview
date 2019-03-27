@@ -40,9 +40,8 @@ public class ProductReviewController {
 	@PostMapping(value = "/{productid}/reviews")
 	public ResponseEntity<?> createProductReview(@PathVariable("productid") Integer productID,
 			@RequestBody Review review) {
-		review.setProductId(productID);
-		Review review1 = reviewService.saveProductReview(review);
-
+		review.setProductId(productID);		
+		Review review1 = reviewService.saveProductReview(review);		
 		return new ResponseEntity<>(review1, HttpStatus.CREATED);
 	}
 
